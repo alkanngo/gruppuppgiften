@@ -13,10 +13,21 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Setup the database
 const db = new Database();
 db.addCollection('cats', [
-  { name: 'Fluffy', color: 'White', age: 3 },
-  { name: 'Aslan', color: 'Gold', age: 11 },
-  { name: 'Kitty', color: 'Grey', age: 1 },
+  new Cat('Missan', 'Black', 10),
+  new Cat('Peter', 'Orange', 10),
+  new Cat('Nisse', 'Green', 10),
 ]);
+db.addCollection('dogs', [
+  new Dog('Quinse', 'Black', 10),
+  new Dog('Kira', 'Orange', 10),
+  new Dog('Luke', 'Green', 10),
+]);
+db.addCollection('pokemon', [
+  new Dog('Pikachu', 'Black', 10),
+  new Dog('Bulbasour', 'Orange', 10),
+  new Dog('Charizard', 'Green', 10),
+]);
+
 
 // Setup the routes
 app.post('/cat', (req, res) => {
