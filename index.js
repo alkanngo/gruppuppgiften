@@ -54,20 +54,6 @@ app.get('/cats', (req, res) => {
   });
 });
 
-app.get('/dogs', (req, res) => {
-  return res.status(200).send({
-    success: true,
-    data: db.dogs.all(),
-  });
-});
-
-app.get('/pokemon', (req, res) => {
-  return res.status(200).send({
-    success: true,
-    data: db.pokemon.all(),
-  });
-});
-
 app.get('/cat/:id', (req, res) => {
   const id = parseInt(req.params.id, 10);
   const cat = db.cats.find({ id });
