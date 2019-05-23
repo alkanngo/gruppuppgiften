@@ -1,19 +1,18 @@
 import db from './collections';
 import app from './server';
+import SuccessResponse from './Classes/SuccessResponse';
+import FailedResponse from "./Classes/FailedResponse";
 
 // Setup the routes
 app.post('/:key', (req, res) => {
   // Appending an S to the key to specify that its plural
   const keyPlusS = `${req.params.key}s`;
   // Save that in to dbCollection
-  const dbCollection = db[keyPlusS];
+  const dbCollection = db[keyPlusS]; // TODO change variable name
   if (dbCollection) {
     if (!req.body.name) {
       console.log(req.body);
-      return res.status(400).send({
-        success: false,
-        message: 'Name is required',
-      });
+      return res.status(400).send(new FailedResponse(false,'Name is required'));
     }
   }
   const newObject = req.body;
@@ -31,16 +30,9 @@ app.get('/:key', (req, res) => {
   const dbCollection = db[req.params.key];
 
   if (dbCollection) {
-    return res.status(200).send({
-      success: true,
-      data: dbCollection,
-    });
+    return res.status(200).send( new SuccessResponse(true, dbCollection));
   }
-  return res.status(404).send({
-    success: false,
-    // Used to check that the key that is passed in doesnt exist.
-    message: `${req.params.key} not found`,
-  });
+  return res.status(404).send( new FailedResponse(false, `${req.params.key} not found`));
 });
 
 app.get('/:key/:id', (req, res) => {
@@ -53,16 +45,10 @@ app.get('/:key/:id', (req, res) => {
   if (dbCollection) {
     const dbObject = dbCollection.find({ id });
     if (dbObject) {
-      return res.status(200).send({
-        success: true,
-        data: dbObject,
-      });
+      return res.status(200).send(new SuccessResponse(true, dbObject));
     }
   }
-  return res.status(404).send({
-    success: false,
-    message: `${req.params.key} not found`,
-  });
+  return res.status(404).send(new FailedResponse(false, `${req.params.key} not found`));
 });
 
 app.get('/search/:collection/:key/:value', (req, res) => {
@@ -72,14 +58,8 @@ app.get('/search/:collection/:key/:value', (req, res) => {
   if (dbCollection) {
     const dbObject = dbCollection.find({ [key]: value });
     if (dbObject) {
-      return res.status(200).send({
-        success: true,
-        data: dbObject,
-      });
+      return res.status(200).send(new SuccessResponse(true, dbObject));
     }
-    return res.status(404).send({
-      success: false,
-      message: `${req.params.key} not found`,
-    });
+    return res.status(404).send(new FailedResponse(false, `${req.params.key} not found`));
   }
 });
