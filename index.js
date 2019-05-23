@@ -6,9 +6,9 @@ import FailedResponse from "./Classes/FailedResponse";
 // Setup the routes
 app.post('/:key', (req, res) => {
     // Appending an S to the key to specify that its plural
-    const keyPlusS = `${req.params.key}s`;
+    const appendS = `${req.params.key}s`;
     // Save that in to dbCollection
-    const dbCollection = db[keyPlusS]; // TODO change variable name
+    const dbCollection = db[appendS];
     if (dbCollection) {
         if (!req.body.name) {
             console.log(req.body);
