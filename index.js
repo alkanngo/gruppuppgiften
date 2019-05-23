@@ -1,7 +1,7 @@
 import db from './collections';
 import app from './server';
 import SuccessResponse from './Classes/SuccessResponse';
-import FailedResponse from "./Classes/FailedResponse";
+import FailedResponse from './Classes/FailedResponse';
 
 // Setup the routes
 app.post('/:key', (req, res) => {
