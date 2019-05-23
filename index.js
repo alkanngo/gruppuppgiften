@@ -38,9 +38,9 @@ app.get('/:key', (req, res) => {
 app.get('/:key/:id', (req, res) => {
     const id = parseInt(req.params.id, 10);
     // Appending an S to the key to specify that its plural
-    const keyPlusS = `${req.params.key}s`;
+    const appendS = `${req.params.key}s`;
     // Save that in to dbCollection
-    const dbCollection = db[keyPlusS];
+    const dbCollection = db[appendS];
     // Check if dbCollection exists and save the id into the dbObject.
     if (dbCollection) {
         const dbObject = dbCollection.find({id});
@@ -51,8 +51,8 @@ app.get('/:key/:id', (req, res) => {
     return res.status(404).send(new FailedResponse(false, `${req.params.key} not found`));
 });
 /*
-app.get('/search/:key/:value', (req, res) => {
-    const {key, value} = req.params;
+app.get('/search/:collection/:key/:value', (req, res) => {
+    const {collection, key, value} = req.params;
     const dbCollection = db[collection];
 
     if (dbCollection) {
