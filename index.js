@@ -1,33 +1,5 @@
-import express from 'express';
-import bodyParser from 'body-parser';
-import Database from './lib/db';
-import Cat from './Classes/Cat';
-import Dog from './Classes/Dog';
-
-// Setup the server
-const PORT = 3000;
-const app = express();
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-// Setup the database
-const db = new Database();
-db.addCollection('cats', [
-  new Cat('Missan', 'Black', 10),
-  new Cat('Peter', 'Orange', 10),
-  new Cat('Nisse', 'Green', 10),
-]);
-db.addCollection('dogs', [
-  new Dog('Quinse', 'Black', 10),
-  new Dog('Kira', 'Orange', 10),
-  new Dog('Luke', 'Green', 10),
-]);
-db.addCollection('pokemons', [
-  new Dog('Pikachu', 'Black', 10),
-  new Dog('Bulbasour', 'Orange', 10),
-  new Dog('Charizard', 'Green', 10),
-]);
-
+import db from './collections';
+import app from './server';
 
 // Setup the routes
 app.post('/:key', (req, res) => {
@@ -52,6 +24,7 @@ app.post('/:key', (req, res) => {
     id: newId,
   });
 });
+
 // Purpose: Look for any type of creature by passing in the "key"-variable
 app.get('/:key', (req, res) => {
   // Saving the request result, by checking the userinput(key)
@@ -109,10 +82,4 @@ app.get('/search/:collection/:key/:value', (req, res) => {
       message: `${req.params.key} not found`,
     });
   }
-});
-
-
-// Start server
-app.listen(PORT, () => {
-  console.log(`The server is listening on port ${PORT}`);
 });
