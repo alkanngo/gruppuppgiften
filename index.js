@@ -1,78 +1,80 @@
-import express from 'express';
-import bodyParser from 'body-parser';
-import Database from './lib/db';
-
-// Setup the server
-const PORT = 3000;
-const app = express();
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-// Setup the database
-const db = new Database();
-db.addCollection('cats', [
-  { name: 'Fluffy', color: 'White', age: 3 },
-  { name: 'Aslan', color: 'Gold', age: 11 },
-  { name: 'Kitty', color: 'Grey', age: 1 },
-]);
+import db from './collections';
+import app from './server';
+import SuccessResponse from './Classes/SuccessResponse';
+import FailedResponse from './Classes/FailedResponse';
 
 // Setup the routes
-app.post('/cat', (req, res) => {
-  if (!req.body.name) {
-    console.log(req.body);
-    return res.status(400).send({
-      success: false,
-      message: 'Name is required for cat',
+app.post('/:key', (req, res) => {
+    // Appending an S to the key to specify that its plural
+    const appendS = `${req.params.key}s`;
+    // Save that in to dbCollection
+    const dbCollection = db[appendS];
+    if (dbCollection) {
+        if (!req.body.name) {
+            console.log(req.body);
+            return res.status(400).send(new FailedResponse(false, 'Name is required'));
+        }
+    }
+    const newObject = req.body;
+    const newId = dbCollection.push(newObject);
+    return res.status(201).send({
+        success: true,
+        message: 'Added successfully',
+        id: newId,
     });
-  }
-  const newCat = req.body;
-  const newId = db.cats.push(newCat);
-  return res.status(201).send({
-    success: true,
-    message: 'Cat added successfully',
-    id: newId,
-  });
 });
 
-app.get('/cats', (req, res) => {
-  return res.status(200).send({
-    success: true,
-    data: db.cats.all(),
-  });
+// Purpose: Look for any type of creature by passing in the "key"-variable
+app.get('/:key', (req, res) => {
+    // Saving the request result, by checking the userinput(key)
+    const dbCollection = db[req.params.key];
+
+    if (dbCollection) {
+        return res.status(200).send(new SuccessResponse(true, dbCollection));
+    }
+    return res.status(404).send(new FailedResponse(false, `${req.params.key} not found`));
 });
 
-app.get('/cat/:id', (req, res) => {
-  const id = parseInt(req.params.id, 10);
-  const cat = db.cats.find({ id });
-  if (cat) {
-    return res.status(200).send({
-      success: true,
-      data: cat,
+app.get('/:key/:id', (req, res) => {
+    const id = parseInt(req.params.id, 10);
+    // Appending an S to the key to specify that its plural
+    const appendS = `${req.params.key}s`;
+    // Save that in to dbCollection
+    const dbCollection = db[appendS];
+    // Check if dbCollection exists and save the id into the dbObject.
+    if (dbCollection) {
+        const dbObject = dbCollection.find({id});
+        if (dbObject) {
+            return res.status(200).send(new SuccessResponse(true, dbObject));
+        }
+    }
+    return res.status(404).send(new FailedResponse(false, `${req.params.key} not found`));
+});
+/*
+app.get('/search/:collection/:key/:value', (req, res) => {
+    const {collection, key, value} = req.params;
+    const dbCollection = db[collection];
+
+    if (dbCollection) {
+        const dbObject = dbCollection.find({[key]: value});
+        if (dbObject) {
+            return res.status(200).send(new SuccessResponse(true, dbObject));
+        }
+        return res.status(404).send(new FailedResponse(false, `${req.params.key} not found`));
+    }
+});*/
+const animalArray = ['cat', 'dog', 'pokemon'];
+animalArray.forEach((animal) => {
+    app.get('/' + animal + 'Search/:key/:value', (req, res) => {
+        const {animal, key, value} = req.params;
+        const dbCollection = db[animal];
+
+        if (dbCollection) {
+            const dbObject = dbCollection.find({[key]: value});
+            if (dbObject) {
+                return res.status(200).send(new SuccessResponse(true, dbObject));
+            }
+            return res.status(404).send(new FailedResponse(false, `${req.params.key} not found`));
+        }
     });
-  }
-  return res.status(404).send({
-    success: false,
-    message: 'Cat not found',
-  });
-});
-
-app.get('/catSearch/:key/:value', (req, res) => {
-  const { key, value } = req.params;
-  const cat = db.cats.find({ [key]: value });
-  if (cat) {
-    return res.status(200).send({
-      success: true,
-      data: cat,
-    });
-  }
-  return res.status(404).send({
-    success: false,
-    message: 'Cat not found',
-  });
-});
-
-
-// Start server
-app.listen(PORT, () => {
-  console.log(`The server is listening on port ${PORT}`);
 });
