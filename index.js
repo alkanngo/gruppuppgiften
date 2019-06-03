@@ -50,23 +50,11 @@ app.get('/:key/:id', (req, res) => {
     }
     return res.status(404).send(new FailedResponse(false, `${req.params.key} not found`));
 });
-/*
-app.get('/search/:collection/:key/:value', (req, res) => {
-    const {collection, key, value} = req.params;
-    const dbCollection = db[collection];
 
-    if (dbCollection) {
-        const dbObject = dbCollection.find({[key]: value});
-        if (dbObject) {
-            return res.status(200).send(new SuccessResponse(true, dbObject));
-        }
-        return res.status(404).send(new FailedResponse(false, `${req.params.key} not found`));
-    }
-});*/
 const animalArray = ['cat', 'dog', 'pokemon'];
 animalArray.forEach((animal) => {
     app.get('/' + animal + 'Search/:key/:value', (req, res) => {
-        const {animal, key, value} = req.params;
+        const {key, value} = req.params;
         const dbCollection = db[animal];
 
         if (dbCollection) {
@@ -76,5 +64,6 @@ animalArray.forEach((animal) => {
             }
             return res.status(404).send(new FailedResponse(false, `${req.params.key} not found`));
         }
+        return res.status(404).send(new FailedResponse(false, `${req.params.key} not found`));
     });
 });
